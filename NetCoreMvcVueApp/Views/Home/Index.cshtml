@@ -1,0 +1,115 @@
+﻿@model IndexViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="text-center">
+    <div id="app">
+        <h2 class="display-4">User: {{user.name}}</h2>
+        <h2 class="display-4">Last name: {{user.lastName}}</h2>
+        <h2 class="display-4">User name: {{user.userName}}</h2>
+        <hr />
+        <h1 class="display-4">Create new friend</h1>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"></span>
+            </div>
+            <input type="text" class="form-control" v-model="new_friend.name" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"></span>
+            </div>
+            <input type="text" class="form-control" v-model="new_friend.lastName" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"></span>
+            </div>
+            <input type="text" class="form-control" v-model="new_friend.userName" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
+        </div>
+        <button type="button" class="btn btn-dark" v-on:click="addFriend">AddFriend</button>
+        <hr />
+        <div v-if="friends_list.length > 0">
+            <h2 class="display-4">Friends!</h2>
+            <div class="list-group"  v-for="friend in friends_list">
+                <a v-on:click="removeFriend(friend.userName, friend.lastName, friend.name)" class="list-group-item list-group-item-action">
+                    User: {{friend.name}}, Last Name {{friend.lastName}}, UserName: {{friend.userName}}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    h2{
+        display:flex;
+        justify-content:flex-end;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script>
+    let app = new Vue({
+        el: '#app',
+        data: {
+            user: {
+                userName: '@Model.User.UserName',
+                lastName: '@Model.User.LastName',
+                name: '@Model.User.Name'
+            },
+            new_friend: {
+                userName: "",
+                lastName: "",
+                name: ""
+            },
+            friends_list: []
+        },
+        mounted: function () {
+            let friendList = '@Html.Raw(Json.Serialize(Model.FriendList))';
+            this.friends_list = JSON.parse(friendList);
+        },
+        methods: {
+            getFriendsList: function () {
+                let self = this;
+                fetch('@Url.Action("GetFriendsList", "Home")')
+                    .then(response => response.json())
+                    .then(data => self.friends_list = data);
+            },
+            addFriend: function () {
+                let self = this;
+                fetch('@Url.Action("InsertNewFriendInMemory", "Home")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(self.new_friend),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data)
+                        self.getFriendsList();
+                })
+            },
+            removeFriend: function (userName, lastName, name) {
+                let self = this;
+                let deleteParameters = {
+                    userName: userName,
+                    lastName: lastName,
+                    name: name
+                };
+                fetch('@Url.Action("RemoveFriend", "Home")', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(deleteParameters)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data)
+                        self.getFriendsList();
+                })
+            }
+        }
+    })
+</script>
