@@ -39,6 +39,7 @@ namespace NetCoreMvcVueApp.Controllers
 			};
 
 			TempData["TempDataFriendsList"] = JsonConvert.SerializeObject(friendsList);
+
 			var model = new IndexViewModel
 			{
 				User = new User
@@ -49,13 +50,16 @@ namespace NetCoreMvcVueApp.Controllers
 				},
 				FriendList = friendsList
 			};
+
 			return View(model);
         }
 
 		[HttpPost]
 		public bool InsertNewFriendInMemory([FromBody] User friend)
 		{
-			if (friend == default || !TempData.ContainsKey("TempDataFriendsList")) return false;
+			if (friend == default || !TempData.ContainsKey("TempDataFriendsList")) 
+				return false;
+
 			var tempData = TempData["TempDataFriendsList"];
 			var deserializedData = JsonConvert.DeserializeObject<List<User>>((string)tempData);
 			deserializedData.Add(friend);
@@ -74,7 +78,9 @@ namespace NetCoreMvcVueApp.Controllers
 		[HttpDelete]
 		public bool RemoveFriend([FromBody] User friend)
 		{
-			if (friend == default || !TempData.ContainsKey("TempDataFriendsList")) return false;
+			if (friend == default || !TempData.ContainsKey("TempDataFriendsList")) 
+				return false;
+
 			var tempData = TempData["TempDataFriendsList"];
 			var deserializedData = JsonConvert.DeserializeObject<List<User>>((string)tempData);
 			deserializedData.Remove(friend);
