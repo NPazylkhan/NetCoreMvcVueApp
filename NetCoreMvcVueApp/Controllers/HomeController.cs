@@ -64,6 +64,7 @@ namespace NetCoreMvcVueApp.Controllers
 			var deserializedData = JsonConvert.DeserializeObject<List<User>>((string)tempData);
 			deserializedData.Add(friend);
 			TempData["TempDataFriendsList"] = JsonConvert.SerializeObject(deserializedData);
+
 			return true;
 		}
 
@@ -72,6 +73,7 @@ namespace NetCoreMvcVueApp.Controllers
 			var tempData = TempData["TempDataFriendsList"];
 			TempData.Keep();
 			var deserializedData = JsonConvert.DeserializeObject<List<User>>((string)tempData);
+
 			return deserializedData;
 		}
 
@@ -85,8 +87,10 @@ namespace NetCoreMvcVueApp.Controllers
 			var deserializedData = JsonConvert.DeserializeObject<List<User>>((string)tempData);
 			deserializedData.Remove(friend);
 			TempData["TempDataFriendsList"] = JsonConvert.SerializeObject(deserializedData);
+
 			return true;
 		}
+
 		public IActionResult Privacy()
         {
             return View();
